@@ -120,6 +120,7 @@ flowchart TB
   %% =========================
   %% PURCHASING — BLUE
   %% =========================
+  PR --> PQ
   PQ --> PO
   PO --> GRPO
   GRPO --> AP
