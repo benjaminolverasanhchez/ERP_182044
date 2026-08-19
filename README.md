@@ -1,130 +1,214 @@
 # ERP_182044
 ```mermaid
-flowchart LR
-    %% ==========================================
-    %% ESTILOS DE COLORES POR MÓDULO (CIRCULARES)
-    %% ==========================================
-    classDef crm fill:#57B938,stroke:#2e6d1c,stroke-width:2px,color:#FFFFFF,font-size:11px;
-    classDef sales fill:#FF8C00,stroke:#b35f00,stroke-width:2px,color:#FFFFFF,font-size:11px;
-    classDef purchasing fill:#0088CC,stroke:#005580,stroke-width:2px,color:#FFFFFF,font-size:11px;
-    classDef production fill:#5B1865,stroke:#340d3a,stroke-width:2px,color:#FFFFFF,font-size:11px;
-    classDef service fill:#FFEB3B,stroke:#c4a000,stroke-width:2px,color:#222222,font-size:11px;
-    classDef inventory fill:#7F8C8D,stroke:#485052,stroke-width:2px,color:#FFFFFF,font-size:11px;
-    classDef finance fill:#E52B20,stroke:#94160e,stroke-width:2px,color:#FFFFFF,font-size:11px;
-    classDef reporting fill:#E066FF,stroke:#8f22ad,stroke-width:2px,color:#FFFFFF,font-size:11px;
-    classDef hub fill:#FFFFFF,stroke:#333333,stroke-width:3px,color:#111111,font-size:11px;
+flowchart TB
 
-    %% ==========================================
-    %% 1. CRM / SRM (LÍNEA VERDE)
-    %% ==========================================
-    ACT((Activities)):::crm
-    CUST((Customer)):::crm
-    LEAD((Lead)):::crm
-    SUPP((Supplier)):::crm
-    BPM((Business Partner<br/>Master)):::crm
+%% =========================================================
+%% PROCESOS DE NEGOCIO — VISTA VERTICAL
+%% =========================================================
 
-    ACT === CUST === LEAD === SUPP === BPM
+%% ---------- CRM / SRM ----------
+subgraph CRM["CRM / SRM"]
+direction TB
+  ACT["Activities"]
+  CUST["Customer"]
+  LEAD["Lead"]
+  SUP["Supplier"]
+  BPM["Business Partner<br/>Master"]
+  OPP["Opportunity"]
+  SOUR["Sourcing"]
 
-    %% ==========================================
-    %% 2. SERVICE (LÍNEA AMARILLA)
-    %% ==========================================
-    CEC((Customer<br/>Equipment Card)):::service
-    SC((Service<br/>Call)):::service
-    SCON((Service<br/>Contract)):::service
-    SB((Service<br/>Billing)):::service
+  ACT --> CUST --> LEAD --> SUP --> BPM
+  CUST --> OPP
+  SUP --> SOUR
+end
 
-    CUST -.->|Vínculo Servicio| CEC
-    CEC === SC === SCON === SB
+%% ---------- SALES ----------
+subgraph SALES["Sales"]
+direction TB
+  PRICE["Pricing"]
+  SQ["Sales Quotation"]
+  SO["Sales Order"]
 
-    %% ==========================================
-    %% 3. SALES (LÍNEA NARANJA)
-    %% ==========================================
-    OPP((Opportunity)):::crm
-    PRIC((Pricing)):::inventory
-    SQ((Sales<br/>Quotation)):::sales
-    SO((Sales<br/>Order)):::sales
-    DN((Delivery<br/>Note)):::sales
-    AR_INV((AR<br/>Invoice)):::sales
-    IN_PAY((Incoming<br/>Payments)):::sales
+  OPP --> PRICE --> SQ --> SO
+end
 
-    CUST === OPP === PRIC === SQ === SO === DN === AR_INV === IN_PAY
-    LEAD -.-> OPP
+%% ---------- PURCHASING ----------
+subgraph PURCH["Purchasing"]
+direction TB
+  PR["Purchase Request"]
+  PQ["Purchase Quotation"]
+  PO["Purchase Order"]
+  MR["Material<br/>Requirements<br/>Planning"]
 
-    %% ==========================================
-    %% 4. PURCHASING (LÍNEA AZUL)
-    %% ==========================================
-    PR((Purchase<br/>Request)):::purchasing
-    PQ((Purchase<br/>Quotation)):::purchasing
-    PO((Purchase<br/>Order)):::purchasing
-    GRPO((Goods Receipt<br/>PO)):::purchasing
-    AP_INV((AP<br/>Invoice)):::purchasing
-    OUT_PAY((Outgoing<br/>Payments)):::purchasing
+  PR --> PQ --> PO
+  MR --> PO
+  SUP --> PR
+end
 
-    SUPP -.-> PR
-    PR === PQ === PO === GRPO === AP_INV === OUT_PAY
+%% ---------- INVENTORY ----------
+subgraph INV["Inventory"]
+direction TB
+  IM["Item Master"]
+  WM["Warehouse<br/>Management"]
+  DN["Delivery Note"]
+  GRPO["Goods Receipt PO"]
+  GR["Receipt from Production"]
+  IAR["Inventory Audit<br/>Report"]
 
-    %% ==========================================
-    %% 5. PRODUCTION (LÍNEA MORADA)
-    %% ==========================================
-    BOM((Bill of<br/>Materials)):::production
-    MRP((Material Requirements<br/>Planning)):::production
-    SRC((Sourcing)):::purchasing
-    PROD_ORD((Production<br/>Order)):::production
-    ISS_P((Issue to<br/>Production)):::production
-    REC_P((Receipt from<br/>Production)):::production
+  IM --> WM --> DN --> GRPO --> GR --> IAR
+end
 
-    BOM === MRP === SRC === PROD_ORD === ISS_P === REC_P
+%% ---------- PRODUCTION ----------
+subgraph PROD["Production"]
+direction TB
+  PP["Production Order"]
+  IP["Issue to Production"]
+  BOM["Bill of Materials"]
+  DEM["Demand<br/>Planning"]
+  BOR["Backorder<br/>Reporting"]
 
-    %% ==========================================
-    %% 6. INVENTORY (LÍNEA GRIS DE CRUCE)
-    %% ==========================================
-    ITEM_M((Item<br/>Master)):::inventory
-    WM((Warehouse<br/>Management)):::inventory
-    DP((Demand<br/>Planning)):::inventory
+  BOM --> DEM --> BOR
+  PP --> IP
+end
 
-    PRIC --- ITEM_M --- WM --- SO
-    WM --- PO
-    SO --- PO --- PROD_ORD --- DP
+%% ---------- SERVICE ----------
+subgraph SERVICE["Service"]
+direction TB
+  CEC["Customer<br/>Equipment Card"]
+  SC["Service Call"]
+  SCT["Service Contract"]
+  SB["Service Billing"]
+  FP["Financial<br/>Postings"]
 
-    %% ==========================================
-    %% 7. FINANCE (LÍNEA ROJA)
-    %% ==========================================
-    COA((Chart of<br/>Accounts)):::finance
-    GLA((General Ledger<br/>Accounts)):::finance
-    GL_DET((G/L Account<br/>Determination)):::finance
-    COST_ACC((Cost<br/>Accounting)):::finance
-    JE((Journal<br/>Entries)):::finance
-    FIN_POST((Financial<br/>Postings)):::finance
-    AP_AR((AP / AR)):::finance
-    CASH_MGT((Cash<br/>Management)):::finance
-    REC((Reconciliation)):::finance
+  CEC --> SC --> SCT --> SB --> FP
+end
 
-    BOM -.-> DP
-    COA === GLA === GL_DET === COST_ACC === JE
-    DN === JE
-    GRPO === JE
-    SB -.-> FIN_POST
-    JE === FIN_POST === AP_AR === CASH_MGT === REC
+%% ---------- FINANCE ----------
+subgraph FIN["Finance"]
+direction TB
+  APAR["AP / AR"]
+  ARINV["AR Invoice"]
+  APINV["AP Invoice"]
+  INPAY["Incoming<br/>Payments"]
+  OUTPAY["Outgoing<br/>Payments"]
+  CM["Cash Management"]
+  REC["Reconciliation"]
+  FR["Financial<br/>Reporting"]
+  JE["Journal Entries"]
+  CA["Cost Accounting"]
+  COA["Chart of Accounts"]
+  GL["General Ledger<br/>Accounts"]
+  GLAD["G/L Account<br/>Determination"]
 
-    %% ==========================================
-    %% 8. REPORTING (LÍNEA ROSA)
-    %% ==========================================
-    BOR((Backorder<br/>Reporting)):::reporting
-    IAR((Inventory Audit<br/>Report)):::reporting
-    ABR((Account Balances<br/>Report)):::reporting
-    PROD_REP((Product<br/>Reporting)):::reporting
-    FIN_REP((Financial<br/>Reporting)):::reporting
+  APAR --> ARINV --> INPAY
+  APAR --> APINV --> OUTPAY
+  CM --> REC --> FR
+  JE --> CA
+  COA --> GL --> GLAD --> CA
+end
 
-    PROD_ORD -.-> BOR
-    DP === BOR === IAR === ABR === PROD_REP === FIN_REP
-    REC === FIN_REP
-    REC_P === PROD_REP
+%% ---------- REPORTING ----------
+subgraph REP["Reporting"]
+direction TB
+  FPST["Financial Postings"]
+  ABR["Account Balances<br/>Report"]
+  PRR["Product<br/>Reporting"]
 
-    %% Conexiones financieras auxiliares
-    AR_INV -.-> AP_AR
-    AP_INV -.-> AP_AR
-    IN_PAY -.-> CASH_MGT
-    OUT_PAY -.-> CASH_MGT
-    JE -.-> IAR
-    FIN_POST -.-> ABR
+  FPST --> ABR --> PRR
+end
+
+
+%% =========================================================
+%% FLUJOS PRINCIPALES
+%% =========================================================
+
+CUST --> PRICE
+SQ --> SO
+SO --> DN
+
+PO --> GRPO
+GRPO --> IP
+PP --> GR
+GR --> FPST
+
+CEC --> IM
+WM --> DN
+DN --> GRPO
+
+SB --> FP
+FP --> FPST
+
+SO --> PP
+PP --> IP
+
+IP --> JE
+FPST --> JE
+
+ARINV --> APAR
+APINV --> APAR
+
+INPAY --> CM
+OUTPAY --> CM
+
+%% CRM / SRM relationships
+CUST -.-> CEC
+SUP -.-> PR
+SUP -.-> PO
+
+%% Planning relationships
+MR -.-> PO
+DEM -.-> PP
+BOR -.-> IAR
+
+%% Reporting
+CA --> FPST
+GL --> FPST
+FR --> PRR
+
+
+%% =========================================================
+%% ESTILOS
+%% =========================================================
+
+classDef crm fill:#49B51B,color:#fff,stroke:#2d7f0d,stroke-width:2px;
+classDef service fill:#FFF900,color:#111,stroke:#c9c000,stroke-width:2px;
+classDef sales fill:#FF9900,color:#fff,stroke:#d87500,stroke-width:2px;
+classDef inventory fill:#888888,color:#fff,stroke:#666,stroke-width:2px;
+classDef purchasing fill:#008DCC,color:#fff,stroke:#006a99,stroke-width:2px;
+classDef finance fill:#FF0000,color:#fff,stroke:#b00000,stroke-width:2px;
+classDef production fill:#650B72,color:#fff,stroke:#45064e,stroke-width:2px;
+classDef reporting fill:#E06BEA,color:#fff,stroke:#b34cbd,stroke-width:2px;
+
+class ACT,CUST,LEAD,SUP,BPM,OPP,SOUR crm;
+class CEC,SC,SCT,SB,FP service;
+class PRICE,SQ,SO sales;
+class IM,WM,DN,GRPO,GR,IAR inventory;
+class PR,PQ,PO,MR purchasing;
+class APAR,ARINV,APINV,INPAY,OUTPAY,CM,REC,FR,JE,CA,COA,GL,GLAD finance;
+class PP,IP,BOM,DEM,BOR production;
+class FPST,ABR,PRR reporting;
+
+%% =========================================================
+%% COLORES DE CONEXIONES POR FLUJO
+%% =========================================================
+
+%% CRM / SRM
+linkStyle 0,1,2,3,4 stroke:#49B51B,stroke-width:4px;
+%% Sales
+linkStyle 5,6 stroke:#FF9900,stroke-width:4px;
+%% Purchasing
+linkStyle 7,8 stroke:#008DCC,stroke-width:4px;
+%% Inventory
+linkStyle 9,10,11,12,13 stroke:#888888,stroke-width:4px;
+%% Production
+linkStyle 14,15,16 stroke:#650B72,stroke-width:4px;
+%% Service
+linkStyle 17,18,19,20 stroke:#FFF000,stroke-width:4px;
+%% Finance
+linkStyle 21,22,23,24,25,26,27,28,29,30,31,32 stroke:#FF0000,stroke-width:4px;
+%% Reporting
+linkStyle 33,34 stroke:#E06BEA,stroke-width:4px;
+
+%% Flujos secundarios discontinuos
+linkStyle 35,36,37,38,39,40 stroke:#49B51B,stroke-width:3px,stroke-dasharray:8 6;
 ```
