@@ -26,10 +26,10 @@ flowchart LR
     PAY["💵<br/><b>Incoming Payment</b>"]:::stepNode
 
     %% Conexiones del flujo
-    SO -->|Copy to (Parcial 1)| D1
+    SO --> D1
     D1 -.->|Actualiza estado| ST_OPEN
     
-    ST_OPEN -->|Copy to (Parcial 2)| D2
+    ST_OPEN --> D2
     D2 -.->|Actualiza estado| ST_CLOSED
 
     D1 -->|Factura entrega 1| INV
