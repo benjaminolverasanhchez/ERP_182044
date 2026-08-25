@@ -1,49 +1,39 @@
 ```mermaid
+```mermaid
 flowchart LR
-    %% Estilos de los estados de la orden
-    classDef closedStatus fill:#D7F3D0,stroke:#5BAA4F,stroke-width:2px,color:#000000,font-size:12px;
-    classDef openStatus fill:#DDF6FD,stroke:#3BAFD8,stroke-width:2px,color:#000000,font-size:12px;
-    classDef stepNode fill:#FFFFFF,stroke:#333333,stroke-width:1.5px,color:#000000,font-size:13px;
+    %% Estilos de nodos y estados
+    classDef stepNode fill:#FFFFFF,stroke:#00A88F,stroke-width:2px,rx:12,ry:12,color:#000000,font-size:12px;
+    classDef openStatus fill:#DDF6FD,stroke:#3BAFD8,stroke-width:2px,color:#000000,font-size:11px;
+    classDef closedStatus fill:#D7F3D0,stroke:#5BAA4F,stroke-width:2px,color:#000000,font-size:11px;
 
     %% ----------------------------------------------------
-    %% PASO 1: Initial Sales Process
+    %% ORDEN DE VENTA BASE
     %% ----------------------------------------------------
-    subgraph S1 ["<b>Initial Sales Process</b>"]
-        direction LR
-        SO1["🛒<br/><b>Sales Order</b><br/>Qty. 10"]:::stepNode
-        D1["🚚<br/><b>Delivery 1</b><br/>Qty. 10"]:::stepNode
-        ST1["<b>Sales Order:</b><br/>Status: Closed<br/>Open Qty: 0"]:::closedStatus
-
-        SO1 -->|Copy to| D1
-        D1 -.->|Updates Status| ST1
-    end
+    SO["🛒<br/><b>Sales Order</b><br/>Total Qty: 10"]:::stepNode
 
     %% ----------------------------------------------------
-    %% PASO 2: Return (Based on Delivery)
+    %% ENTREGAS PARCIALES
     %% ----------------------------------------------------
-    subgraph S2 ["<b>Return (Based on Delivery)</b>"]
-        direction LR
-        D1_REF["🚚<br/><b>Delivery 1</b>"]:::stepNode
-        RET["↩️🚚<br/><b>Return</b><br/>Qty. 3"]:::stepNode
-        ST2["<b>Sales Order:</b><br/>Status: Open<br/>Open Qty: 3"]:::openStatus
+    D1["🚚<br/><b>Partial Delivery 1</b><br/>Qty: 6"]:::stepNode
+    ST_OPEN["<b>Sales Order Status:</b><br/>Status: Open<br/>Open Qty: 4"]:::openStatus
 
-        D1_REF -->|Copy to| RET
-        RET -.->|Reopens Base Order| ST2
-    end
+    D2["🚚<br/><b>Partial Delivery 2</b><br/>Qty: 4"]:::stepNode
+    ST_CLOSED["<b>Sales Order Status:</b><br/>Status: Closed<br/>Open Qty: 0"]:::closedStatus
 
     %% ----------------------------------------------------
-    %% PASO 3: Subsequent Delivery of Open Quantity
+    %% FACTURACIÓN Y PAGO
     %% ----------------------------------------------------
-    subgraph S3 ["<b>Subsequent Delivery of Open Quantity</b>"]
-        direction LR
-        SO2["🛒<br/><b>Sales Order</b><br/>(Reopened)"]:::stepNode
-        D2["🚚<br/><b>Delivery 2</b><br/>Qty. 3"]:::stepNode
-        ST3["<b>Sales Order:</b><br/>Status: Closed<br/>Open Qty: 0"]:::closedStatus
+    INV["📄<br/><b>A/R Invoice</b><br/>Total Invoiced: 10"]:::stepNode
+    PAY["💵<br/><b>Incoming Payment</b>"]:::stepNode
 
-        SO2 -->|Copy to| D2
-        D2 -.->|Updates Status| ST3
-    end
+    %% Conexiones del flujo
+    SO -->|Copy to (Parcial 1)| D1
+    D1 -.->|Actualiza estado| ST_OPEN
+    
+    ST_OPEN -->|Copy to (Parcial 2)| D2
+    D2 -.->|Actualiza estado| ST_CLOSED
 
-    %% Conexión lógica entre fases del proceso
-    S1 ==> S2 ==> S3
+    D1 -->|Factura entrega 1| INV
+    D2 -->|Factura entrega 2| INV
+    INV --> PAY
 ```
