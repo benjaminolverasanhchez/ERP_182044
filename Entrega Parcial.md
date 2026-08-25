@@ -1,5 +1,4 @@
 ```mermaid
-```mermaid
 flowchart LR
     %% Estilos de nodos y estados
     classDef stepNode fill:#FFFFFF,stroke:#00A88F,stroke-width:2px,rx:12,ry:12,color:#000000,font-size:12px;
