@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
     %% Estilos BPMN
     classDef startEvent fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724;
@@ -62,3 +63,4 @@ flowchart TD
     end
 
     Sub6 --> End([🔴 Fin: Generación Automática de Órdenes de Compra]):::endEvent
+```
